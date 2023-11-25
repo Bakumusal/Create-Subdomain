@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="login-container">
+        <h1>User Login</h1>
+
+        <form id="login-form">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="Enter username" required>
+            <br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter password" required>
+            <br>
+
+            <div>
+                <button type="button" onclick="validateLogin()">Login</button>
+                <p>Not a member? <a href="https://wa.me/62888888888" target="_blank">Contact admin now</a></p>
+            </div>
+        </form>
+
+    </div>
+
+    <div id="main-container" style="display: none;">
+        <h1>Create Subdomain</h1>
+
+        <form id="subdomain-form" onsubmit="createSubdomain(event)">
+            <label for="subdomain">Subdomain</label>
+            <input type="text" id="subdomain" name="subdomain" placeholder="Enter subdomain" required>
+            <br>
+
+            <label for="domain">Domain</label>
+            <select id="domain" name="domain" required>
+                <option value="" disabled selected>Select Domain</option>
+                <option value="yourdomain.com">yourdomain.com</option>
+                <option value="yourdomain.org">yourdomain.org</option>
+            </select>
+            <br>
+
+            <label for="type">Type</label>
+            <select id="type" name="type" required>
+                <option value="A">A</option>
+            </select>
+            <br>
+
+            <label for="ip_address">IPv4 Address</label>
+            <input type="text" id="ip_address" name="ip_address" placeholder="Enter IPv4 address" required>
+            <br>
+
+            <input type="submit" value="Create Subdomain">
+        </form>
+
+        <div class="social-icons">
+            <a href="https://instagram.com/bojasb_" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://github.com/Bakumusal" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
+            <a href="https://www.youtube.com/@bakumusalchannel4424" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+
+    </div>
+
+    <script>
+        const credentials = [
+            { username: 'user', password: 'user' },
+            { username: 'user2', password: 'user2' },
+            { username: 'user3', password: 'user3' },
+            // Add more username and password pairs as needed
+        ];
+
+        function validateLogin() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+
+            var isValidCredentials = credentials.some(cred => cred.username === username && cred.password === password);
+
+            if (isValidCredentials) {
+                document.getElementById("login-container").style.display = "none";
+                document.getElementById("main-container").style.display = "block";
+            } else {
+                alert("Invalid username or password");
+            }
+        }
+
+        function createSubdomain(event) {
+            event.preventDefault();
+            var subdomainForm = document.getElementById("subdomain-form");
+            var formData = new FormData(subdomainForm);
+
+            fetch("process.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    var subdomainInfo = `Type: ${formData.get("type")}\nProxy: Off\nSubdomain: ${formData.get("subdomain")}.${formData.get("domain")}\nIPv4 Address: ${formData.get("ip_address")}\nCreated On: ${new Date().toLocaleString()}`;
+                    alert("Subdomain created successfully!\n" + subdomainInfo);
+                } else {
+                    handleSubdomainError(data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                handleSubdomainError("An unexpected error occurred.");
+            });
+        }
+
+        function handleSubdomainError(message) {
+            alert("Error creating subdomain. Please try again.\nResponse: " + message);
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
